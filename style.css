@@ -5,20 +5,32 @@ body {
     width: 100%;
     height: 100%;
     overflow: hidden;
+    background-color: #111;
 }
 
 .tabs {
     display: block;
     height: 35px;
     width: 100%;
-    background-color: #444;
+    background-color: #111;
 }
 
 .navbar {
     display: block;
     height: 65px;
     width: 100%;
+    background-color: #444;
+}
+
+#webinput {
+    margin-top: 12px;
+    margin-left: 70px;
+    width: 90%;
     background-color: #000;
+    border: 3px solid #666;
+    border-radius: 15px;
+    color: #fff;
+    font-size: 12px;
 }
 
 .container {
