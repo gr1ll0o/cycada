@@ -7,17 +7,24 @@ body {
     overflow: hidden;
 }
 
-#container {
+.tabs {
+    display: block;
+    height: 35px;
+    width: 100%;
+    background-color: #444;
+}
+
+.navbar {
+    display: block;
+    height: 65px;
+    width: 100%;
+    background-color: #000;
+}
+
+.container {
     width: 100vw;
     height: 100vh;
     display: block;
     overflow: hidden;
     flex: 1;
-}
-
-#navbar {
-    display: block;
-    height: 70px;
-    width: 100%;
-    background-color: #000;
 }
