@@ -6,6 +6,7 @@ body {
     height: 100%;
     overflow: hidden;
     background-color: #111;
+    color: #fff;
 }
 
 .tabs {
@@ -33,10 +34,14 @@ body {
     font-size: 12px;
 }
 
-.container {
+#container {
     width: 100vw;
     height: 100vh;
     display: block;
     overflow: hidden;
     flex: 1;
+}
+
+.error-page {
+    margin: 50px;
 }
