@@ -1,7 +1,15 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 
 let mainWindow;
+
+ipcMain.on("close-app", () => {
+  app.quit();
+});
+
+function quitApplication() {
+  ipcRenderer.send('quit-app');
+}
 
 function createWindow() {
   mainWindow= new BrowserWindow({
