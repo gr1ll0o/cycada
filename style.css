@@ -58,6 +58,7 @@ button:disabled {
 
 #webinput {
     margin-top: 4px;
+    padding: 3px 10px;
     width: 80%;
     background-color: #000;
     border: 3px solid #666;
@@ -83,4 +84,28 @@ button:disabled {
 
 .error-page {
     margin: 50px;
+}
+
+html,
+body {
+    background-image: url("bg.jpg");
+    background-repeat: no-repeat;
+    background-size: contain; 
+    background-position: center;
+}
+
+#main-input {
+    border-radius: 10px;
+    background-color: #555;
+    color: #fff;
+    padding: 20px;
+    font-size: 20px;
+    width: 70%;
+    box-shadow: 11px 11px 11px -1px rgba(65, 65, 65, 0.61);
+    margin-top: 15%;
+}
+
+#main-page p {
+    margin: 0;
+    padding: 0;
 }
