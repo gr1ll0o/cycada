@@ -19,7 +19,8 @@ function createWindow() {
   });
 
   mainWindow.loadFile("index.html");
-  //mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
+  mainWindow.webContents.setZoomLevel(1); 
 }
 
 app.whenReady().then(() => {

@@ -1,9 +1,12 @@
-/// -- GRAL. VARIABLES --
-let history = ["https://google.com"];
-let pos = 0;
+// ===========================
+// VARIABLE
+// ===========================
+let history = [];
+let pos = -1;
 
-/// -- ELEMENTS --
-// WEB VIEW
+// ===========================
+// ELEMENTS
+// ===========================
 const webView = document.getElementById('vista');
 const container = document.getElementById('container');
 
@@ -13,17 +16,15 @@ const forward = document.querySelector('#forward');
 const refresh = document.querySelector('#refresh');
 const webInput = document.getElementById('webinput');
 
-// deshabilitar botones de inicio
-back.disabled = true;
-forward.disabled = true;
-
 // error pages
 const nameNotResolved = document.getElementById('name-not-resolved');
 const internetDisconnected = document.getElementById('internet-disconnected');
 const connectionTimedOut = document.getElementById('connection-timed-out');
 
+// ===========================
+// FUNCTIONS
+// ===========================
 
-/// -- FUNCTIONS --
 function hideAllErrors() {
     document.querySelectorAll('.error-page').forEach(err => {
         err.style.display = 'none';
@@ -39,7 +40,7 @@ function isIP(str) {
 function updateInputWithURL(raw) {
     try {
         const url = new URL(raw);
-        webInput.value = url.protocol + "//" + url.hostname;
+        webInput.value = url.href;
     } catch {
         webInput.value = raw;
     }
@@ -50,53 +51,79 @@ function updateButtons() {
     forward.disabled = (pos >= history.length - 1);
 }
 
+function normalizeURL(raw) {
+    try {
+        const u = new URL(raw);
+        return u.origin + u.pathname;
+    } catch {
+        return raw;
+    }
+}
+
+function addToHistory(url) {
+    if (pos < history.length - 1) {
+        history = history.slice(0, pos + 1);
+    }
+
+    history.push(url);
+    pos = history.length - 1;
+
+    updateButtons();
+}
+
+function handleNavigation(url) {
+    if (pos === -1) {
+        addToHistory(url);
+        return;
+    }
+
+    const last = history[pos];
+    const current = url;
+
+    if (last !== current) {
+        addToHistory(url);
+    }
+}
+
 function web(query) {
     webInput.blur();
-    document.body.style.background = 'none';
-    document.body.style.backgroundColor = '#555';
 
     let finalURL = query;
 
+    // IP or protocol
     if (isIP(query)) {
         if (!query.startsWith("http://") && !query.startsWith("https://")) {
             finalURL = "http://" + query;
         }
     }
+    // Text without protocol
     else if (!query.startsWith("http://") && !query.startsWith("https://")) {
         finalURL = "https://www.google.com/search?q=" + query;
     }
 
-    if (pos < history.length - 1) {
-        history = history.slice(0, pos + 1);
-    }
-
     webView.src = finalURL;
 
-    history.push(finalURL);
-    pos = history.length - 1;
-
-    updateButtons();
     updateInputWithURL(finalURL);
     hideAllErrors();
     container.style.display = 'block';
+    document.body.style.background = 'none';
+    document.body.style.backgroundColor = '#333';
 }
 
-/// -- PROGRAM --
+// ===========================
+// PROGRAM
+// ===========================
 
-mainInput = document.getElementById('main-input');
+const mainInput = document.getElementById('main-input');
 mainInput.addEventListener('keydown', (event) => {
-    let query = mainInput.value;
-
     if (event.key === 'Enter') {
-        web(query)
+        web(mainInput.value);
     }
-})
+});
 
 webInput.addEventListener('keydown', (event) => {
-    let query = webInput.value;
-
     if (event.key === 'Enter') {
-        web(query)
+        web(webInput.value);
     }
 });
 
@@ -108,7 +135,6 @@ webInput.addEventListener('click', () => {
 webView.addEventListener('did-fail-load', (event) => {
     container.style.display = 'none';
     hideAllErrors();
-    console.log("did-fail-load:", event.errorDescription);
 
     switch (event.errorDescription) {
         case "ERR_NAME_NOT_RESOLVED":
@@ -124,14 +150,28 @@ webView.addEventListener('did-fail-load', (event) => {
     }
 });
 
-win.webContents.on('did-fail-load', (e, code, desc, url) => {
-    if (code === -3) return; // navegación abortada → ignorar
-    console.log('falló, recargando en 300ms:', desc);
-    setTimeout(() => win.loadURL(url), 300);
+webView.addEventListener('did-navigate-in-page', (event) => {
+    //console.log("URL interna cambió:", event.url);
+    console.log(history);
+    handleNavigation(event.url);
+    updateButtons();
+    webInput.value = webView.src;
+    back.disabled = true;
+    forward.disable = true;
+});
+
+webView.addEventListener("did-stop-loading", () => {
+    console.log("Cargó al 100%");
+    back.disabled = false;
+    forward.disable = false;
 });
 
 
-// -- BACK --
+
+// ===========================
+// BUTTONS
+// ===========================
+
 back.addEventListener('click', () => {
     if (pos > 0) {
         pos--;
@@ -143,7 +183,6 @@ back.addEventListener('click', () => {
     }
 });
 
-// -- FORWARD --
 forward.addEventListener('click', () => {
     if (pos < history.length - 1) {
         pos++;
@@ -155,11 +194,9 @@ forward.addEventListener('click', () => {
     }
 });
 
-// -- REFRESH --
 refresh.addEventListener('click', () => {
     webView.reload();
 });
 
-// Init
+//   INIT
 webInput.value = "welcome";
-webView.setZoomFactor(1);
