@@ -1,5 +1,5 @@
 // ===========================
-// VARIABLE
+// VARIABLES
 // ===========================
 let history = [];
 let pos = -1;
@@ -24,6 +24,10 @@ const connectionTimedOut = document.getElementById('connection-timed-out');
 // ===========================
 // FUNCTIONS
 // ===========================
+
+document.getElementById("btn-close").addEventListener("click", () => {
+    window.electronAPI.closeApp();
+});
 
 function hideAllErrors() {
     document.querySelectorAll('.error-page').forEach(err => {
@@ -110,6 +114,10 @@ function web(query) {
     document.body.style.backgroundColor = '#333';
 }
 
+function quit() {
+    ipcRenderer.send('quit-app');
+}
+
 // ===========================
 // PROGRAM
 // ===========================
@@ -165,7 +173,6 @@ webView.addEventListener("did-stop-loading", () => {
     back.disabled = false;
     forward.disable = false;
 });
-
 
 
 // ===========================
