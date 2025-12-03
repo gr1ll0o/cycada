@@ -136,3 +136,74 @@ body {
     margin: 0;
     padding: 0;
 }
+
+#menu {
+    display: inline-block;
+    transform: scaleX(1.5);
+    /* Aumenta el ancho */
+    transform-origin: left;
+    /* Opcional: evita que se deforme hacia ambos lados */
+    cursor: pointer;
+}
+
+#menu-icon {
+    position: absolute;
+    top: 46px;
+    right: 6px;
+}
+
+#menu-box {
+    display: none;
+    position: absolute;
+    right: 8px;
+    margin-top: 13px;
+    background-color: #333;
+    border-radius: 8px;
+    padding: 8px;
+    border-radius: 6px;
+    width: 200px;
+    color: white;
+}
+
+.menu-item {
+    padding: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.menu-item:hover {
+    background-color: #555;
+}
+
+.menu-item:active {
+    background-color: #888;
+}
+
+/* Línea del Zoom */
+.zoom-item {
+    cursor: default;
+}
+
+/* Contenedor de - 100% + */
+.zoom-controls {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.zoom-btn {
+    padding: 0 6px;
+    border-radius: 4px;
+    background: #333;
+    cursor: pointer;
+}
+
+.zoom-btn:hover {
+    background: #444;
+}
+
+.zoom-item:hover { background-color: #333; }
+
+#zoom-minus:active, #zoom-plus:active { background-color: #666; }
