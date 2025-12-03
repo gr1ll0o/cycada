@@ -7,3 +7,7 @@ window.addEventListener("DOMContentLoaded", () => {
 contextBridge.exposeInMainWorld("electronAPI", {
   closeApp: () => ipcRenderer.send("close-app"),
 });
+
+contextBridge.exposeInMainWorld("electronAPI", {
+    setFullscreen: (flag) => ipcRenderer.invoke("set-fullscreen", flag)
+});

@@ -7,6 +7,12 @@ ipcMain.on("close-app", () => {
   app.quit();
 });
 
+ipcMain.handle("set-fullscreen", (event, flag) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    if (win) win.setFullScreen(flag);
+});
+
+
 function quitApplication() {
   ipcRenderer.send('quit-app');
 }

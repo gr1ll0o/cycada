@@ -5,6 +5,10 @@ let history = [];
 let pos = -1;
 
 let currentZoom = 1.0;
+const TLDs = [
+    ".com", ".net", ".org", ".edu", ".gov", ".io", ".es", ".ar",
+    ".dev", ".app", ".info", ".biz", ".xyz", ".online", ".me"
+];
 
 // ===========================
 // ELEMENTS
@@ -38,6 +42,10 @@ const connectionRefused = document.getElementById('connection-refused');
 document.getElementById("btn-close").addEventListener("click", () => {
     window.electronAPI.closeApp();
 });
+
+function isDomain(str) {
+    return /^[a-zA-Z0-9-]+\.[a-zA-Z]{2,24}$/.test(str.trim());
+}
 
 function hideAllErrors() {
     document.querySelectorAll('.error-page').forEach(err => {
@@ -109,6 +117,11 @@ function web(query) {
     }else if (isIP(query)) { // IP or protocol 
         if (!query.startsWith("http://") && !query.startsWith("https://")) {
             finalURL = "http://" + query;
+        }
+    }else if (isDomain(query)) {
+        console.log(isDomain(query));
+        if (!query.startsWith("http://") && !query.startsWith("https://")) {
+            finalURL = "https://" + query;
         }
     }else if (!query.startsWith("http://") && !query.startsWith("https://")) { // Text without protocol
         finalURL = "https://www.google.com/search?q=" + query;
@@ -240,6 +253,14 @@ webView.addEventListener("did-stop-loading", () => {
     forward.disable = false;
     zoomPlus.disable = false;
     zoomMinus.disable = false;
+});
+
+webView.addEventListener("enter-html-full-screen", () => {
+    window.electronAPI.setFullscreen(true);
+});
+
+webView.addEventListener("leave-html-full-screen", () => {
+    window.electronAPI.setFullscreen(false);
 });
 
 
