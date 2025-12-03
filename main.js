@@ -4,6 +4,8 @@
 let history = [];
 let pos = -1;
 
+let currentZoom = 1.0;
+
 // ===========================
 // ELEMENTS
 // ===========================
@@ -15,6 +17,13 @@ const back = document.querySelector('#back');
 const forward = document.querySelector('#forward');
 const refresh = document.querySelector('#refresh');
 const webInput = document.getElementById('webinput');
+
+const menuIcon = document.getElementById("menu-icon");
+const menuBox = document.getElementById("menu-box");
+const items = document.querySelectorAll(".menu-item");
+const zoomMinus = document.getElementById("zoom-minus");
+const zoomPlus = document.getElementById("zoom-plus");
+const zoomValue = document.getElementById("zoom-value");
 
 // error pages
 const nameNotResolved = document.getElementById('name-not-resolved');
@@ -114,6 +123,10 @@ function web(query) {
     document.body.style.backgroundColor = '#333';
 }
 
+function updateZoomDisplay() {
+    zoomValue.textContent = Math.round(currentZoom * 100) + "%";
+}
+
 function quit() {
     ipcRenderer.send('quit-app');
 }
@@ -128,6 +141,52 @@ mainInput.addEventListener('keydown', (event) => {
         web(mainInput.value);
     }
 });
+
+// HIDE / SHOW MENUBOX
+menuIcon.addEventListener("click", (ev) => {
+    ev.stopPropagation();
+    menuBox.style.display = menuBox.style.display === "block" ? "none" : "block";
+});
+document.addEventListener("click", (ev) => {
+    if (ev.target !== menuIcon && !menuBox.contains(ev.target)) {
+        menuBox.style.display = "none";
+    }
+});
+
+// DONT HIDE THE MENUBOX IF PARTICULAR ITEM PRESSED
+document.getElementById("zoom-item").addEventListener("click", (e) => { e.stopPropagation(); });
+
+// ACTIONS OF MENUBOX
+items.forEach(item => {
+    item.addEventListener("click", () => {
+        const action = item.dataset.action;
+        console.log("Elegiste:", action);
+        menuBox.style.display = "none";
+
+        // EXAMPLE
+        if (action === "youtube") web("https://youtube.com");
+        if (action === "github") web("https://github.com");
+        if (action === "home") web("https://google.com");
+    });
+});
+
+/// ========================
+///   ZOOM
+/// ========================
+zoomPlus.addEventListener('click', (e) => {
+    e.stopPropagation();
+    currentZoom += 0.1;
+    webView.setZoomFactor(currentZoom);
+    updateZoomDisplay();
+});
+
+zoomMinus.addEventListener('click', (e) => {
+    e.stopPropagation();
+    currentZoom -= 0.1;
+    webView.setZoomFactor(currentZoom);
+    updateZoomDisplay();
+});
+/////////////////////////////////////
 
 webInput.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
@@ -163,6 +222,7 @@ webView.addEventListener('did-navigate-in-page', (event) => {
     console.log(history);
     handleNavigation(event.url);
     updateButtons();
+    webView.setZoomFactor(currentZoom);
     webInput.value = webView.src;
     back.disabled = true;
     forward.disable = true;
@@ -170,6 +230,7 @@ webView.addEventListener('did-navigate-in-page', (event) => {
 
 webView.addEventListener("did-stop-loading", () => {
     console.log("Cargó al 100%");
+    webView.setZoomFactor(currentZoom);
     back.disabled = false;
     forward.disable = false;
 });
@@ -206,4 +267,4 @@ refresh.addEventListener('click', () => {
 });
 
 //   INIT
-webInput.value = "welcome";
+webInput.value = "Busca en Google o ingrese dirección";
