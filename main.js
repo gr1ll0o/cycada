@@ -29,6 +29,7 @@ const zoomValue = document.getElementById("zoom-value");
 const nameNotResolved = document.getElementById('name-not-resolved');
 const internetDisconnected = document.getElementById('internet-disconnected');
 const connectionTimedOut = document.getElementById('connection-timed-out');
+const connectionRefused = document.getElementById('connection-refused');
 
 // ===========================
 // FUNCTIONS
@@ -103,14 +104,13 @@ function web(query) {
 
     let finalURL = query;
 
-    // IP or protocol
-    if (isIP(query)) {
+    if (query == "cycada:settings" || query == "cicada:settings") {
+        finalURL = "assets/html/preferences.html"
+    }else if (isIP(query)) { // IP or protocol 
         if (!query.startsWith("http://") && !query.startsWith("https://")) {
             finalURL = "http://" + query;
         }
-    }
-    // Text without protocol
-    else if (!query.startsWith("http://") && !query.startsWith("https://")) {
+    }else if (!query.startsWith("http://") && !query.startsWith("https://")) { // Text without protocol
         finalURL = "https://www.google.com/search?q=" + query;
     }
 
@@ -120,7 +120,7 @@ function web(query) {
     hideAllErrors();
     container.style.display = 'block';
     document.body.style.background = 'none';
-    document.body.style.backgroundColor = '#333';
+    document.body.style.backgroundColor = '#222';
 }
 
 function updateZoomDisplay() {
@@ -164,7 +164,7 @@ items.forEach(item => {
         menuBox.style.display = "none";
 
         // EXAMPLE
-        if (action === "youtube") web("https://youtube.com");
+        if (action === "preferences") web("cycada:settings");
         if (action === "github") web("https://github.com");
         if (action === "home") web("https://google.com");
     });
@@ -211,8 +211,10 @@ webView.addEventListener('did-fail-load', (event) => {
             internetDisconnected.style.display = 'block';
             break;
         case "ERR_CONNECTION_TIMED_OUT":
-        case "ERR_CONNECTION_REFUSED":
             connectionTimedOut.style.display = 'block';
+            break;
+        case "ERR_CONNECTION_REFUSED":
+            connectionRefused.style.display = 'block';
             break;
     }
 });
@@ -226,13 +228,18 @@ webView.addEventListener('did-navigate-in-page', (event) => {
     webInput.value = webView.src;
     back.disabled = true;
     forward.disable = true;
+    zoomPlus.disable = true;
+    zoomMinus.disable = true;
+    container.style.display = 'block';
 });
 
 webView.addEventListener("did-stop-loading", () => {
-    console.log("Cargó al 100%");
+    console.log("Loaded page");
     webView.setZoomFactor(currentZoom);
     back.disabled = false;
     forward.disable = false;
+    zoomPlus.disable = false;
+    zoomMinus.disable = false;
 });
 
 
@@ -268,3 +275,5 @@ refresh.addEventListener('click', () => {
 
 //   INIT
 webInput.value = "Busca en Google o ingrese dirección";
+zoomPlus.disable = true;
+zoomMinus.disable = true;
