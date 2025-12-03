@@ -3,12 +3,10 @@
 // ===========================
 let history = [];
 let pos = -1;
+let lastURL = "";
 
+let lastLoadHadError = false;
 let currentZoom = 1.0;
-const TLDs = [
-    ".com", ".net", ".org", ".edu", ".gov", ".io", ".es", ".ar",
-    ".dev", ".app", ".info", ".biz", ".xyz", ".online", ".me"
-];
 
 // ===========================
 // ELEMENTS
@@ -42,6 +40,21 @@ const connectionRefused = document.getElementById('connection-refused');
 document.getElementById("btn-close").addEventListener("click", () => {
     window.electronAPI.closeApp();
 });
+
+function startURLWatcher() {
+    setInterval(() => {
+        const current = webView.getURL();
+
+        if (current && current !== lastURL) {
+            console.log("URL cambió internamente:", current);
+
+            handleNavigation(current);
+            updateInputWithURL(current);
+
+            lastURL = current;
+        }
+    }, 300);
+}
 
 function isDomain(str) {
     return /^[a-zA-Z0-9-]+\.[a-zA-Z]{2,24}$/.test(str.trim());
@@ -112,8 +125,15 @@ function web(query) {
 
     let finalURL = query;
 
-    if (query == "cycada:settings" || query == "cicada:settings") {
+    if (query == "cycada:settings") {
         finalURL = "assets/html/preferences.html"
+    }else if (query == "cycada:home") {
+        container.style.display = 'none';
+        document.body.style.backgroundImage = "url('assets/bg.jpg')";
+        document.body.style.backgroundSize = "cover";
+        document.getElementById('main-page').style.display = 'block';
+        webView.src = '';
+        return;
     }else if (isIP(query)) { // IP or protocol 
         if (!query.startsWith("http://") && !query.startsWith("https://")) {
             finalURL = "http://" + query;
@@ -178,8 +198,7 @@ items.forEach(item => {
 
         // EXAMPLE
         if (action === "preferences") web("cycada:settings");
-        if (action === "github") web("https://github.com");
-        if (action === "home") web("https://google.com");
+        if (action === "home") web("cycada:home");
     });
 });
 
@@ -212,6 +231,12 @@ webInput.addEventListener('click', () => {
     webInput.select();
 });
 
+webView.addEventListener("dom-ready", () => {
+    console.log("Webview listo");
+
+    startURLWatcher();
+});
+
 webView.addEventListener('did-fail-load', (event) => {
     container.style.display = 'none';
     hideAllErrors();
@@ -230,6 +255,7 @@ webView.addEventListener('did-fail-load', (event) => {
             connectionRefused.style.display = 'block';
             break;
     }
+    lastLoadHadError = true;
 });
 
 webView.addEventListener('did-navigate-in-page', (event) => {
@@ -238,15 +264,23 @@ webView.addEventListener('did-navigate-in-page', (event) => {
     handleNavigation(event.url);
     updateButtons();
     webView.setZoomFactor(currentZoom);
-    webInput.value = webView.src;
     back.disabled = true;
     forward.disable = true;
     zoomPlus.disable = true;
     zoomMinus.disable = true;
     container.style.display = 'block';
+    webInput.value = event.url;
+    webInput.value = webView.src;
 });
 
 webView.addEventListener("did-stop-loading", () => {
+    if (lastLoadHadError) {
+        console.log("Hubo un error al cargar la página");
+
+        // Reset para la próxima carga
+        lastLoadHadError = false;
+        return;
+    }else { container.style.display = 'block'; }
     console.log("Loaded page");
     webView.setZoomFactor(currentZoom);
     back.disabled = false;
