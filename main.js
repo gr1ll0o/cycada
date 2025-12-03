@@ -1,3 +1,37 @@
+// CONFIG
+let config;
+
+async function loadOrCreateConfig() {
+    const existing = await window.electronAPI.readConfig();
+
+    if (existing) {
+        config = existing;
+    } else {
+        config = {
+            theme: "dark",
+            homepage: "https://google.com",
+            zoom: 1.0,
+            history: []
+        };
+        await window.electronAPI.saveConfig(config);
+    }
+}
+
+async function saveConfig() {
+    await window.electronAPI.saveConfig(config);
+}
+
+async function addToConfigHistory(url) {
+    if (!Array.isArray(config.history)) {
+        config.history = [];
+    }
+
+    // handle cloned
+    if (config.history.at(-1) !== url) {
+        config.history.push(url);
+        await saveConfig();
+    }
+}
 // ===========================
 // VARIABLES
 // ===========================
@@ -68,8 +102,7 @@ function hideAllErrors() {
 }
 
 function isIP(str) {
-    return /^(\d{1,3}\.){3}\d{1,3}$/.test(str) &&
-           str.split('.').every(n => n >= 0 && n <= 255);
+    return /^(\d{1,3}\.){3}\d{1,3}$/.test(str) && str.split('.').every(n => n >= 0 && n <= 255);
 }
 
 function updateInputWithURL(raw) {
@@ -104,6 +137,7 @@ function addToHistory(url) {
     pos = history.length - 1;
 
     updateButtons();
+    addToConfigHistory(url);
 }
 
 function handleNavigation(url) {
@@ -125,8 +159,10 @@ function web(query) {
 
     let finalURL = query;
 
-    if (query == "cycada:settings") {
-        finalURL = "assets/html/preferences.html"
+    if (query == "cycada:history") {
+        finalURL = "assets/html/history.html";
+    }else if (query == "cycada:settings") {
+        finalURL = "assets/html/preferences.html";
     }else if (query == "cycada:home") {
         container.style.display = 'none';
         document.body.style.backgroundImage = "url('assets/bg.jpg')";
@@ -196,9 +232,9 @@ items.forEach(item => {
         console.log("Elegiste:", action);
         menuBox.style.display = "none";
 
-        // EXAMPLE
+        if (action === "history") web("cycada:history");
         if (action === "preferences") web("cycada:settings");
-        if (action === "home") web("cycada:home");
+        if (action === "home") web(config.homepage);
     });
 });
 
@@ -210,6 +246,8 @@ zoomPlus.addEventListener('click', (e) => {
     currentZoom += 0.1;
     webView.setZoomFactor(currentZoom);
     updateZoomDisplay();
+    config.zoom = currentZoom;
+    saveConfig();
 });
 
 zoomMinus.addEventListener('click', (e) => {
@@ -217,6 +255,8 @@ zoomMinus.addEventListener('click', (e) => {
     currentZoom -= 0.1;
     webView.setZoomFactor(currentZoom);
     updateZoomDisplay();
+    config.zoom = currentZoom;
+    saveConfig();
 });
 /////////////////////////////////////
 
@@ -229,6 +269,11 @@ webInput.addEventListener('keydown', (event) => {
 webInput.addEventListener('click', () => {
     webInput.value = webView.src;
     webInput.select();
+});
+
+webView.addEventListener("page-title-updated", (event) => {
+    const title = event.title;
+    document.getElementById('title-tab').textContent = title;
 });
 
 webView.addEventListener("dom-ready", () => {
@@ -277,16 +322,20 @@ webView.addEventListener("did-stop-loading", () => {
     if (lastLoadHadError) {
         console.log("Hubo un error al cargar la página");
 
-        // Reset para la próxima carga
+        // reset
         lastLoadHadError = false;
         return;
-    }else { container.style.display = 'block'; }
+    }else { 
+        container.style.display = 'block'; 
+    }
     console.log("Loaded page");
-    webView.setZoomFactor(currentZoom);
     back.disabled = false;
     forward.disable = false;
     zoomPlus.disable = false;
     zoomMinus.disable = false;
+
+    webView.setZoomFactor(currentZoom);
+    // webView.openDevTools();
 });
 
 webView.addEventListener("enter-html-full-screen", () => {
@@ -297,6 +346,25 @@ webView.addEventListener("leave-html-full-screen", () => {
     window.electronAPI.setFullscreen(false);
 });
 
+/// FOR DEBUGGING IN WEB VIEW
+/// -------------------------
+
+webView.addEventListener("ipc-message", async (ev) => {
+    if (ev.channel === "get-history") {
+        console.log("Sending history...");
+
+        const config = await window.electronAPI.readConfig();
+
+        webView.executeJavaScript(`
+            window.dispatchEvent(new MessageEvent("message", {
+                data: {
+                    type: "history-data",
+                    history: ${JSON.stringify(config.history)}
+                }
+            }));
+        `);
+    }
+});
 
 // ===========================
 // BUTTONS
@@ -329,6 +397,14 @@ refresh.addEventListener('click', () => {
 });
 
 //   INIT
+async function init() {
+    await loadOrCreateConfig();
+    currentZoom = config.zoom ?? 1.0;
+    config = await window.electronAPI.readConfig();
+}
+
+init();
+// aplicar zoom desde config
 webInput.value = "Busca en Google o ingrese dirección";
 zoomPlus.disable = true;
 zoomMinus.disable = true;

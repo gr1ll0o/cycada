@@ -22,7 +22,7 @@ body {
 
 .tab {
     display: flex;
-    width: 24%;
+    width: 30%;
     height: 86%;
     margin: 2px;
     background-color: #333;
@@ -32,6 +32,16 @@ body {
     padding-left: 12px;
     padding-right: 10px;
     border-radius: 6px 6px 0px 0px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+#title-tab {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    max-width: 80%;
 }
 
 .tab:hover {

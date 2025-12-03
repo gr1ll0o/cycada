@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Welcome</title>
     <link rel="stylesheet" href="style.css">
 <body>
     <div class="superiorbar">
         <div class="tabs">
             <div class="tab" id="tab1">
-                <span>Welcome</span>
+                <span id="title-tab">Welcome</span>
                 <span>✕</span>
             </div>
             <button id="new-tab">+</button>
@@ -25,9 +25,9 @@
         <button id="refresh"><b>&#128472;</b></button>
         <input type="text" id="webinput" spellcheck="false" autocorrect="false">
         <button id="menu-icon"><span id="menu">≡</span></button>
-        <div id="menu-box">
+        <div id="menu-box"> <!-- MENU BOX!! -->
+            <div class="menu-item" data-action="home">Inicio</div>
             <div class="menu-item" data-action="preferences">Preferencias</div>
-        
             <div class="menu-item zoom-item" id="zoom-item">
                 <span class="zoom-label">Zoom</span>
                 <div class="zoom-controls">
@@ -36,14 +36,14 @@
                     <span class="zoom-btn" id="zoom-plus">+</span>
                 </div>
             </div>
-        
-            <div class="menu-item" data-action="github">GitHub</div>
+            <div class="menu-item" data-action="history">Historial</div>
+            <div class="menu-item">Créditos</div>
         </div>
     </div>
 
     <!-- WEBVIEW/ENGINE -->
     <div id="container" style="display: none;"> 
-        <webview id="vista" src="" style="width: 100%; height: 100%;"></webview>
+        <webview id="vista" preload="webview-preload.js" style="width: 100%; height: 100%;"></webview>
     </div>
 
     <div id="main-page" style="padding: 50px;display: block;">
