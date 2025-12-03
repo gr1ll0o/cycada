@@ -20,3 +20,4 @@ Thumbs.db
 *.swp
 *.tmp
 *.bak
+config.json
