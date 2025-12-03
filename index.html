@@ -8,11 +8,14 @@
 <body>
     <div class="superiorbar">
         <div class="tabs">
-            <div class="tab" id="tab1">Welcome</div>
-            <div class="tab" id="tab1">YouTube</div>
+            <div class="tab" id="tab1">
+                <span>Welcome</span>
+                <span>✕</span>
+            </div>
+            <button id="new-tab">+</button>
         </div>
         <div class="options">
-            <button id="btn-close" onclick="quit()">  ✕  </button>
+            <button id="btn-close" onclick="quit()"><b>  ✕ </b></button>
         </div>
     </div>
     
@@ -20,10 +23,10 @@
         <button id="back"><b><</b></button>
         <button id="forward"><b>></b></button>
         <button id="refresh"><b>&#128472;</b></button>
-        <input type="text" id="webinput">
+        <input type="text" id="webinput" spellcheck="false" autocorrect="false">
         <button id="menu-icon"><span id="menu">≡</span></button>
         <div id="menu-box">
-            <div class="menu-item" data-action="home">Preferencias</div>
+            <div class="menu-item" data-action="preferences">Preferencias</div>
         
             <div class="menu-item zoom-item" id="zoom-item">
                 <span class="zoom-label">Zoom</span>
@@ -47,29 +50,32 @@
         <p style="font-size: 58px;margin-top: 50px;"><b>Bienvenido</b></p>
         <p>Fácil. Sencillo. Eficiente.</p>
     
-        <input id="main-input" type="text" placeholder="Empieza a navegar...">
+        <input id="main-input" type="text" spellcheck="false" autocorrect="false" placeholder="Empieza a navegar...">
     </div>
 
     <div class="error-page" id="name-not-resolved" style="display: none;">
+        <img src="assets/cicada-broken.png" width="220px">
         <h1>Sitio web no encontrado</h1>
         <p>No podemos conectar con el sitio web buscado. Verifica ortografía o intenta más tarde.</p>
     </div>
 
     <div class="error-page" id="internet-disconnected" style="display: none;">
+        <img src="assets/cicada-broken.png" width="220px">
         <h1>No hay conexión</h1>
         <p>Estás desconectado. Verifica tu conexión a internet y vuelve a intentarlo.</p>
     </div>
 
     <div class="error-page" id="connection-timed-out" style="display: none;">
+        <img src="assets/cicada-broken.png" width="220px">
         <h1>Tiempo de espera agotado</h1>
         <p>El sitio no responde. Inténtalo más tarde.</p>
     </div>
 
     <div class="error-page" id="connection-refused" style="display: none;">
+        <img src="assets/cicada-broken.png" width="220px">
         <h1>Conexión rechazada</h1>
         <p>El sitio web rechazó la petición. Es posible que esté caído.</p>
     </div>
-
 
     <script src="main.js"></script>
     <script src="index.js"></script>
