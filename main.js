@@ -1,6 +1,7 @@
 // CONFIG
 let config;
 
+// HISTORY AND CONFIG FILE
 async function loadOrCreateConfig() {
     const existing = await window.electronAPI.readConfig();
 
@@ -32,6 +33,8 @@ async function addToConfigHistory(url) {
         await saveConfig();
     }
 }
+//
+
 // ===========================
 // VARIABLES
 // ===========================
@@ -335,7 +338,7 @@ webView.addEventListener("did-stop-loading", () => {
     zoomMinus.disable = false;
 
     webView.setZoomFactor(currentZoom);
-    // webView.openDevTools();
+    //webView.openDevTools();
 });
 
 webView.addEventListener("enter-html-full-screen", () => {
@@ -345,9 +348,6 @@ webView.addEventListener("enter-html-full-screen", () => {
 webView.addEventListener("leave-html-full-screen", () => {
     window.electronAPI.setFullscreen(false);
 });
-
-/// FOR DEBUGGING IN WEB VIEW
-/// -------------------------
 
 webView.addEventListener("ipc-message", async (ev) => {
     if (ev.channel === "get-history") {
