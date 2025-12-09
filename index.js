@@ -4,7 +4,7 @@ const path = require("path");
 let mainWindow;
 
 ipcMain.on("close-app", () => {
-  app.quit();
+    app.quit();
 });
 
 ipcMain.handle("set-fullscreen", (event, flag) => {
@@ -14,28 +14,42 @@ ipcMain.handle("set-fullscreen", (event, flag) => {
 
 
 function quitApplication() {
-  ipcRenderer.send('quit-app');
+    ipcRenderer.send('quit-app');
 }
 
 function createWindow() {
-  mainWindow= new BrowserWindow({
-    width: 1280,
-    height: 720,
-    autoHideMenuBar: true,
-    useContentSize: true,
-    webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
-      nodeIntegration: false,
-      contextIsolation: true,
-      sandbox: false,
-      webviewTag: true
-    },
-  });
+    mainWindow= new BrowserWindow({
+        width: 1280,
+        height: 720,
+        autoHideMenuBar: true,
+        frame: false,
+        useContentSize: true,
+        webPreferences: {
+          preload: path.join(__dirname, "preload.js"),
+          nodeIntegration: false,
+          contextIsolation: true,
+          sandbox: false,
+          webviewTag: true
+        },
+    });
 
-  mainWindow.loadFile("index.html");
-  mainWindow.webContents.openDevTools();
-  mainWindow.webContents.setZoomLevel(1); 
+    mainWindow.loadFile("index.html");
+    mainWindow.webContents.openDevTools();
+    mainWindow.webContents.setZoomLevel(1); 
 }
+
+ipcMain.on("maximize-window", () => {
+    if (!mainWindow.isMaximized()) mainWindow.maximize();
+});
+
+ipcMain.on("unmaximize-window", () => {
+    if (mainWindow.isMaximized()) mainWindow.unmaximize();
+});
+
+ipcMain.on("toggle-maximize", () => {
+    if (mainWindow.isMaximized()) mainWindow.unmaximize(); 
+    else mainWindow.maximize();
+});
 
 app.whenReady().then(() => {
   createWindow();

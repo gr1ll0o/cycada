@@ -22,7 +22,11 @@ contextBridge.exposeInMainWorld("electronAPI", {
     },
     closeApp: () => ipcRenderer.send("close-app"),
     setFullscreen: (flag) => ipcRenderer.invoke("set-fullscreen", flag),
-    sendToHost: (msg) => ipcRenderer.sendToHost(msg)
+    sendToHost: (msg) => ipcRenderer.sendToHost(msg),
+
+    maximize: () => ipcRenderer.send("maximize-window"),
+    unmaximize: () => ipcRenderer.send("unmaximize-window"),
+    toggleMaximize: () => ipcRenderer.send("toggle-maximize")
 });
 
 window.addEventListener("DOMContentLoaded", () => {

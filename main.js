@@ -396,6 +396,11 @@ refresh.addEventListener('click', () => {
     webView.reload();
 });
 
+document.getElementById("btn-max").onclick = () => {
+    window.electronAPI.toggleMaximize();
+};
+
+
 //   INIT
 async function init() {
     await loadOrCreateConfig();
